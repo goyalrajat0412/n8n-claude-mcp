@@ -1,0 +1,154 @@
+{
+  "name": "Simple Claude Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "minutesInterval": 1,
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "id": "99fe7f62-09d4-4d98-8bbd-99aa25aaef1d",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define your prompt here\nreturn {\n  prompt: \"What are the key features of n8n workflow automation platform?\"\n};"
+      },
+      "id": "b9f0a71c-84b3-4a98-b02d-3ab8d1f2d5f6",
+      "name": "Set Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "mode": "list",
+          "value": "claude-3-7-sonnet-20250219"
+        },
+        "options": {
+          "maxTokensToSample": 4096,
+          "temperature": 0.7
+        }
+      },
+      "id": "c2a5ce34-6cf9-4d86-ab5e-bfaf0a3d59d5",
+      "name": "Anthropic Chat Model",
+      "type": "n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "YOUR_CREDENTIALS_ID",
+          "name": "Anthropic Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "prompt": "={{$json.prompt}}",
+        "options": {}
+      },
+      "id": "d5d63c54-4b86-4e2f-8c7a-92a8d54af3b8",
+      "name": "Chain LLM",
+      "type": "n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatInput": "={{$json.text}}",
+        "options": {}
+      },
+      "id": "f1f8a95e-a8a7-4a43-aa2a-1a2a87e9d5c1",
+      "name": "Manual Chat Trigger",
+      "type": "n8n-nodes-langchain.manualChatTrigger",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Prompt": {
+      "main": [
+        [
+          {
+            "node": "Anthropic Chat Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chain LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chain LLM": {
+      "main": [
+        [
+          {
+            "node": "Manual Chat Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "name": "anthropic"
+    },
+    {
+      "name": "claude"
+    }
+  ],
+  "pinData": {},
+  "versionId": "abcdef-1234-5678-ghijk",
+  "triggerCount": 0,
+  "createdAt": "2025-04-02T12:00:00.000Z",
+  "updatedAt": "2025-04-02T12:00:00.000Z"
+}
